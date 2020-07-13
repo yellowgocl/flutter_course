@@ -16,7 +16,7 @@ class HttpError {
   static const String UNKNOWN = 'UNKNOW';
 
   static const String PARSE_ERROR = 'PARSE_ERROR';
-  
+
   static const String NETWORK_ERROR = 'NETWORK_ERROR';
 
   static const String HTTP_ERROR = 'HTTP_ERROR';
@@ -33,12 +33,12 @@ class HttpError {
 
   String code;
   String message;
-  
+
   HttpError(this.code, this.message);
 
   HttpError.dioError(DioError error) {
     message = error.message;
-    switch(error.type) {
+    switch (error.type) {
       case DioErrorType.CONNECT_TIMEOUT:
         code = CONNECT_TIMEOUT;
         message = '网络连接超时，稍后重试！';
@@ -74,9 +74,9 @@ class HttpError {
 
 typedef SuccessCallback<T> = void Function(dynamic data);
 typedef FailureCallback<T> = void Function(HttpError data);
-typedef T JsonParse<T> (dynamic data);
+typedef T JsonParse<T>(dynamic data);
 
-class Request{
+class Request {
   Map<String, CancelToken> _cancelTokens = Map<String, CancelToken>();
 
   static const int DEFAULT_CONNECT_TIMEOUT = 3000 * 10;
@@ -93,18 +93,16 @@ class Request{
   Request._internal() {
     if (_client == null) {
       BaseOptions options = BaseOptions(
-        connectTimeout: DEFAULT_CONNECT_TIMEOUT,
-        receiveTimeout: DEFAULT_RECEIVE_TIMEOUT
-      );
+          connectTimeout: DEFAULT_CONNECT_TIMEOUT,
+          receiveTimeout: DEFAULT_RECEIVE_TIMEOUT);
       _client = Dio(options);
     }
   }
-  void init ({ 
-    String baseUrl,
-    int connectTimeout,
-    int receiveTimeout,
-    List<Interceptor> interceptors
-  }) {
+  void init(
+      {String baseUrl,
+      int connectTimeout,
+      int receiveTimeout,
+      List<Interceptor> interceptors}) {
     _client.options = _client.options.merge(
       baseUrl: baseUrl,
       connectTimeout: connectTimeout,
@@ -114,6 +112,7 @@ class Request{
       _client.interceptors..addAll(interceptors);
     }
   }
+
   Future<dynamic> post({
     @required String url,
     data,
@@ -123,8 +122,16 @@ class Request{
     FailureCallback failure,
     @required String tag,
   }) {
-    return _request(url: url, tag: tag, data:data, method: POST, params: params, success: success, failure: failure);
+    return _request(
+        url: url,
+        tag: tag,
+        data: data,
+        method: POST,
+        params: params,
+        success: success,
+        failure: failure);
   }
+
   Future<T> get<T>({
     @required String url,
     data,
@@ -135,8 +142,17 @@ class Request{
     JsonParse<T> parse,
     @required String tag,
   }) {
-    return _request(url: url, tag: tag, data:data, method: GET, params: params, parse: parse, success: success, failure: failure);
+    return _request(
+        url: url,
+        tag: tag,
+        data: data,
+        method: GET,
+        params: params,
+        parse: parse,
+        success: success,
+        failure: failure);
   }
+
   Future<T> _request<T>({
     @required String url,
     String method,
@@ -157,19 +173,21 @@ class Request{
     options?.method = method;
     options = options ?? Options(method: method);
     url = _prepareUrl(url, params);
-    try{
+    try {
       CancelToken cancelToken;
       if (tag != null) {
         cancelToken = _cancelTokens[tag] ?? CancelToken();
         _cancelTokens[tag] = cancelToken;
       }
-      Response<Map<String, dynamic>> response = await _client.request<Map<String, dynamic>>(url, 
-        data:data,
-        queryParameters: params,
-        options: options,
-        cancelToken: cancelToken).catchError((e) {
-          Log.e(e);
-        });
+      Response<Map<String, dynamic>> response = await _client
+          .request<Map<String, dynamic>>(url,
+              data: data,
+              queryParameters: params,
+              options: options,
+              cancelToken: cancelToken)
+          .catchError((e) {
+        Log.e(e);
+      });
       //int statusCode = response.data['statusCode'];
       Map<String, dynamic> responseData = response.data;
       if (responseData['code'] == 200) {
@@ -181,7 +199,7 @@ class Request{
       } else {
         return Future.error(response);
       }
-    } on DioError catch(e, s) {
+    } on DioError catch (e, s) {
       Log.e(e.request.baseUrl + e.request.path);
       Log.v('请求出错: $e\n$s');
       if (failure != null && e.type != DioErrorType.CANCEL) {
@@ -189,7 +207,7 @@ class Request{
       }
       return Future.error(e);
     } catch (e, s) {
-      
+      Log.e(e.request.baseUrl + e.request.path);
       Log.v('请求出错: $e\n$s');
       if (failure != null) {
         failure(HttpError(HttpError.UNKNOWN, "网络异常，请稍后重试！"));
@@ -197,14 +215,17 @@ class Request{
       return Future.error(e);
     }
   }
+
   Future<bool> checkNetwork(callback) async {
-    ConnectivityResult connectivityResult = await (Connectivity().checkConnectivity());
+    ConnectivityResult connectivityResult =
+        await (Connectivity().checkConnectivity());
     bool flag = connectivityResult != ConnectivityResult.none;
     if (!flag) {
       callback ?? callback(HttpError(HttpError.NETWORK_ERROR, '网络错误，稍后重试!'));
     }
     return Future.value(flag);
   }
+
   String _prepareUrl(String url, Map<String, dynamic> params) {
     if (params != null && params.isNotEmpty) {
       params.forEach((k, v) {

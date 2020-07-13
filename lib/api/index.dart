@@ -2,16 +2,15 @@ import 'dart:convert';
 
 import 'package:course_book/config/application.dart';
 import 'package:course_book/model/auth.dart';
-import 'package:course_book/utils/log.dart';
 import 'package:crypto/crypto.dart';
-import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 
-class Url{
+class Url {
   String path;
   String method;
   Url(this.path, this.method);
 }
+
 final Map<String, Url> _urls = {
   'auth': Url('/auth/v1/authorize/application/', 'GET')
 };
@@ -33,6 +32,7 @@ class Api {
     Digest hmac = hmacSha1.convert(strBytes);
     String sign = (base64Encode(hmac.bytes));
     url = '$url$appId/$sign/$timestamp';
-    return application.request.get<Auth>(url: url, tag: url, parse: (v) => Auth.fromJson(v));
+    return application.request
+        .get<Auth>(url: url, tag: url, parse: (v) => Auth.fromJson(v));
   }
 }

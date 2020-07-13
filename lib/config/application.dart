@@ -5,6 +5,7 @@ import 'package:fluro/fluro.dart';
 
 import 'package:course_book/env/env.dart';
 import 'package:course_book/utils/log.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../env/index.dart';
 
 Map<String, Env> envMap = {
@@ -12,7 +13,7 @@ Map<String, Env> envMap = {
   "prod": Env.fromJson(prodConfig)
 };
 
-class Application{
+class Application {
   Router router = Router();
   GameContrller gameContrller;
   String _secretKey;
@@ -20,23 +21,28 @@ class Application{
   Env env;
   bool inited = false;
   static final _instance = new Application._internal();
-  factory Application () {
+  factory Application() {
     return _instance;
   }
   Application._internal();
-  
+
   static Application get instance {
     return new Application();
   }
-  String get secretKey{
+
+  String get secretKey {
     return _secretKey == null ? "2k762g1o8ywfu7bh2dby" : _secretKey;
   }
+
   set secretKey(String val) {
     _secretKey = val;
   }
-  Future<bool> initialize({ String envSign = 'dev', GameContrller gameContrller }) async {
+
+  Future<bool> initialize(
+      {String envSign = 'dev', GameContrller gameContrller}) async {
     this.gameContrller = gameContrller;
     if (!inited) {
+      ScreenUtil.init(width: 750, height: 1334, allowFontScaling: true);
       RoutesController.configureRoutes(router);
       inited = true;
       env = envMap.containsKey(envSign) ? envMap[envSign] : envMap['dev'];
