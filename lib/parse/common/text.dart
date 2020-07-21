@@ -1,25 +1,34 @@
-import 'package:course_book/model/widget/textWidgetData.dart';
 import 'package:course_book/parse/builder.dart';
-import 'package:course_book/utils/widgetUtil.dart';
+import 'package:course_book/utils/widget_util.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/widgets.dart' as Base;
+import 'package:flutter/material.dart' as Base;
 
 class Text extends JsonWidget {
   @override
   Base.Widget build(Map<String, dynamic> data, Base.BuildContext buildContext,
-      ClickListener listener) {
+      EventListener listener) {
     // TODO: implement parse
     data = data ?? {};
-    return Base.Text(
-      data['data'],
-      textAlign: WidgetUtil.parseTextAlign(data['textAlign']),
-      overflow: WidgetUtil.parseTextOverflow(data['overflow']),
-      maxLines: data['maxLines'],
-      softWrap: data['softWrap'],
-      textDirection: WidgetUtil.parseTextDirection(data['textDirection']),
-      style: WidgetUtil.parseTextStyle(data['textStyle']),
-      textScaleFactor: WidgetUtil.parseDouble(data['textScaleFactor']),
-    );
+    bool selcetable = WidgetUtil.parseBoolean(data['selectable'], false);
+    return selcetable
+        ? Base.SelectableText(
+            data['data'],
+            textAlign: WidgetUtil.parseTextAlign(data['textAlign']),
+            maxLines: data['maxLines'],
+            textDirection: WidgetUtil.parseTextDirection(data['textDirection']),
+            style: WidgetUtil.parseTextStyle(data['textStyle']),
+            textScaleFactor: WidgetUtil.parseDouble(data['textScaleFactor']),
+          )
+        : Base.Text(
+            data['data'],
+            textAlign: WidgetUtil.parseTextAlign(data['textAlign']),
+            overflow: WidgetUtil.parseTextOverflow(data['overflow']),
+            maxLines: data['maxLines'],
+            softWrap: data['softWrap'],
+            textDirection: WidgetUtil.parseTextDirection(data['textDirection']),
+            style: WidgetUtil.parseTextStyle(data['textStyle']),
+            textScaleFactor: WidgetUtil.parseDouble(data['textScaleFactor']),
+          );
   }
 
   @override
@@ -29,22 +38,32 @@ class Text extends JsonWidget {
 class RichText extends JsonWidget {
   @override
   Base.Widget build(Map<String, dynamic> data, Base.BuildContext buildContext,
-      ClickListener listener) {
+      EventListener listener) {
     data = data ?? {};
-    return Base.Text.rich(
-      _build(data, buildContext, listener),
-      textAlign: WidgetUtil.parseTextAlign(data['textAlign']),
-      overflow: WidgetUtil.parseTextOverflow(data['overflow']),
-      maxLines: data['maxLines'],
-      softWrap: data['softWrap'],
-      textDirection: WidgetUtil.parseTextDirection(data['textDirection']),
-      style: WidgetUtil.parseTextStyle(data['textStyle']),
-      textScaleFactor: WidgetUtil.parseDouble(data['textScaleFactor']),
-    );
+    bool selcetable = WidgetUtil.parseBoolean(data['selectable'], false);
+    return selcetable
+        ? Base.SelectableText.rich(
+            _build(data, buildContext, listener),
+            textAlign: WidgetUtil.parseTextAlign(data['textAlign']),
+            maxLines: data['maxLines'],
+            textDirection: WidgetUtil.parseTextDirection(data['textDirection']),
+            style: WidgetUtil.parseTextStyle(data['textStyle']),
+            textScaleFactor: WidgetUtil.parseDouble(data['textScaleFactor']),
+          )
+        : Base.Text.rich(
+            _build(data, buildContext, listener),
+            textAlign: WidgetUtil.parseTextAlign(data['textAlign']),
+            overflow: WidgetUtil.parseTextOverflow(data['overflow']),
+            maxLines: data['maxLines'],
+            softWrap: data['softWrap'],
+            textDirection: WidgetUtil.parseTextDirection(data['textDirection']),
+            style: WidgetUtil.parseTextStyle(data['textStyle']),
+            textScaleFactor: WidgetUtil.parseDouble(data['textScaleFactor']),
+          );
   }
 
   Base.TextSpan _build(Map<String, dynamic> data,
-      Base.BuildContext buildContext, ClickListener listener) {
+      Base.BuildContext buildContext, EventListener listener) {
     data = data ?? {};
     return Base.TextSpan(
         text: data['text'],

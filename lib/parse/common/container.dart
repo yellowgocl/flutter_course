@@ -1,12 +1,11 @@
 import 'package:course_book/parse/builder.dart';
-import 'package:course_book/utils/widgetUtil.dart';
+import 'package:course_book/utils/widget_util.dart';
 import 'package:flutter/widgets.dart' as Base;
-import 'package:flutter/widgets.dart';
 
 class Container extends JsonWidget {
   @override
   Base.Widget build(Map<String, dynamic> data, Base.BuildContext buildContext,
-      ClickListener listener) {
+      EventListener listener) {
     // TODO: implement build
     Base.Widget child =
         WidgetUtil.parseChild(data['child'], buildContext, listener);
@@ -35,7 +34,7 @@ class Container extends JsonWidget {
 class Flex extends JsonWidget {
   @override
   Base.Widget build(Map<String, dynamic> data, Base.BuildContext buildContext,
-      ClickListener listener) {
+      EventListener listener) {
     // TODO: implement build
     return Base.Flex(
       verticalDirection: WidgetUtil.parseVerticalDirection(
@@ -63,7 +62,7 @@ class Flex extends JsonWidget {
 class Column extends JsonWidget {
   @override
   Base.Widget build(Map<String, dynamic> data, Base.BuildContext buildContext,
-      ClickListener listener) {
+      EventListener listener) {
     // TODO: implement build
     return Base.Column(
       verticalDirection: WidgetUtil.parseVerticalDirection(
@@ -90,7 +89,7 @@ class Column extends JsonWidget {
 class Row extends JsonWidget {
   @override
   Base.Widget build(Map<String, dynamic> data, Base.BuildContext buildContext,
-      ClickListener listener) {
+      EventListener listener) {
     // TODO: implement build
     return Base.Row(
       verticalDirection: WidgetUtil.parseVerticalDirection(
@@ -117,7 +116,7 @@ class Row extends JsonWidget {
 class Expanded extends JsonWidget {
   @override
   Base.Widget build(Map<String, dynamic> data, Base.BuildContext buildContext,
-      ClickListener listener) {
+      EventListener listener) {
     // TODO: implement build
 
     return Base.Expanded(
@@ -135,7 +134,7 @@ class Expanded extends JsonWidget {
 class ExpandedSizedBox extends JsonWidget {
   @override
   Base.Widget build(Map<String, dynamic> data, Base.BuildContext buildContext,
-      ClickListener listener) {
+      EventListener listener) {
     // TODO: implement build
     return Base.SizedBox.expand(
         key: WidgetUtil.parseKey(data['key']),
@@ -150,7 +149,7 @@ class ExpandedSizedBox extends JsonWidget {
 class SizedBox extends JsonWidget {
   @override
   Base.Widget build(Map<String, dynamic> data, Base.BuildContext buildContext,
-      ClickListener listener) {
+      EventListener listener) {
     // TODO: implement build
     return Base.SizedBox(
         width: WidgetUtil.parseWidth(data['width']),
@@ -167,7 +166,7 @@ class SizedBox extends JsonWidget {
 class FittedBox extends JsonWidget {
   @override
   Base.Widget build(Map<String, dynamic> data, Base.BuildContext buildContext,
-      ClickListener listener) {
+      EventListener listener) {
     // TODO: implement build
     return Base.FittedBox(key: WidgetUtil.parseKey(data['key']));
   }
@@ -180,11 +179,11 @@ class FittedBox extends JsonWidget {
 class Wrap extends JsonWidget {
   @override
   Base.Widget build(Map<String, dynamic> data, Base.BuildContext buildContext,
-      ClickListener listener) {
+      EventListener listener) {
     // TODO: implement build
     return Base.Wrap(
       key: WidgetUtil.parseKey(data['key']),
-      direction: WidgetUtil.parseAxis(data['direction'], Axis.horizontal),
+      direction: WidgetUtil.parseAxis(data['direction'], Base.Axis.horizontal),
       alignment: WidgetUtil.parseWrapAlignment(
           data['alignment'], Base.WrapAlignment.start),
       runAlignment: WidgetUtil.parseWrapAlignment(
@@ -209,7 +208,7 @@ class Wrap extends JsonWidget {
 class SafeArea extends JsonWidget {
   @override
   Base.Widget build(Map<String, dynamic> data, Base.BuildContext buildContext,
-      ClickListener listener) {
+      EventListener listener) {
     // TODO: implement build
     return Base.SafeArea(
       child: WidgetUtil.parseChild(data['child'], buildContext, listener),
@@ -231,7 +230,7 @@ class SafeArea extends JsonWidget {
 class Padding extends JsonWidget {
   @override
   Base.Widget build(Map<String, dynamic> data, Base.BuildContext buildContext,
-      ClickListener listener) {
+      EventListener listener) {
     // TODO: implement build
     return Base.Padding(
       child: WidgetUtil.parseChild(data['child'], buildContext, listener),
@@ -242,4 +241,112 @@ class Padding extends JsonWidget {
   @override
   // TODO: implement widgetName
   String get widgetName => 'Padding';
+}
+
+class Align extends JsonWidget {
+  @override
+  Base.Widget build(Map<String, dynamic> data, Base.BuildContext buildContext,
+      EventListener listener) {
+    // TODO: implement build
+    Base.Widget child =
+        WidgetUtil.parseChild(data['child'], buildContext, listener);
+    return Base.Align(
+      key: WidgetUtil.parseKey(data['key']),
+      child: child,
+      alignment: WidgetUtil.parseAlignment(data['alignment']),
+      widthFactor: WidgetUtil.parseDouble(data['widthFactor']),
+      heightFactor: WidgetUtil.parseDouble(data['heightFactor']),
+    );
+  }
+
+  @override
+  // TODO: implement widgetName
+  String get widgetName => 'Align';
+}
+
+class Center extends JsonWidget {
+  @override
+  Base.Widget build(Map<String, dynamic> data, Base.BuildContext buildContext,
+      EventListener listener) {
+    // TODO: implement build
+    Base.Widget child =
+        WidgetUtil.parseChild(data['child'], buildContext, listener);
+    return Base.Center(
+      key: WidgetUtil.parseKey(data['key']),
+      child: child,
+      widthFactor: WidgetUtil.parseDouble(data['widthFactor']),
+      heightFactor: WidgetUtil.parseDouble(data['heightFactor']),
+    );
+  }
+
+  @override
+  // TODO: implement widgetName
+  String get widgetName => 'Center';
+}
+
+class Stack extends JsonWidget {
+  @override
+  Base.Widget build(Map<String, dynamic> data, Base.BuildContext buildContext,
+      EventListener listener) {
+    // TODO: implement build
+
+    return Base.Stack(
+      key: WidgetUtil.parseKey(data['key']),
+      alignment: WidgetUtil.parseAlignment(
+          data['alignment'], Base.AlignmentDirectional.topStart),
+      textDirection: WidgetUtil.parseTextDirection(data['textDirection']),
+      fit: WidgetUtil.parseStackFit(data['fit'], Base.StackFit.loose),
+      overflow: WidgetUtil.parseOverflow(data['overflow']),
+      children:
+          WidgetUtil.parseChildren(data['children'], buildContext, listener),
+    );
+  }
+
+  @override
+  // TODO: implement widgetName
+  String get widgetName => 'Stack';
+}
+
+class IndexedStack extends JsonWidget {
+  @override
+  Base.Widget build(Map<String, dynamic> data, Base.BuildContext buildContext,
+      EventListener listener) {
+    // TODO: implement build
+
+    return Base.IndexedStack(
+      key: WidgetUtil.parseKey(data['key']),
+      index: WidgetUtil.parseDouble(data['index'], 0.0)?.toInt(),
+      alignment: WidgetUtil.parseAlignment(
+          data['alignment'], Base.AlignmentDirectional.topStart),
+      textDirection: WidgetUtil.parseTextDirection(data['textDirection']),
+      children:
+          WidgetUtil.parseChildren(data['children'], buildContext, listener),
+    );
+  }
+
+  @override
+  // TODO: implement widgetName
+  String get widgetName => 'IndexedStack';
+}
+
+class Positioned extends JsonWidget {
+  @override
+  Base.Widget build(Map<String, dynamic> data, Base.BuildContext buildContext,
+      EventListener listener) {
+    // TODO: implement build
+    return Base.Positioned(
+      key: WidgetUtil.parseKey(data['key']),
+      top: WidgetUtil.parseDouble(data['top']),
+      right: WidgetUtil.parseDouble(data['right']),
+      bottom: WidgetUtil.parseDouble(data['bottom']),
+      left: WidgetUtil.parseDouble(data['left']),
+      width: WidgetUtil.parseWidth(data['width']),
+      height: WidgetUtil.parseHeight(data['height']),
+      child: WidgetUtil.parseChild(data['child'], buildContext, listener),
+    );
+  }
+
+  @override
+  // TODO: implement widgetName
+  String get widgetName => 'Positioned';
 }

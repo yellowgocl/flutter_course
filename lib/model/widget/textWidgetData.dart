@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:course_book/utils/widgetUtil.dart';
+import 'package:course_book/utils/widget_util.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 part 'textWidgetData.g.dart';

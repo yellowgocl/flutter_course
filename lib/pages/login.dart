@@ -2,7 +2,7 @@ import 'package:course_book/api/index.dart';
 import 'package:course_book/model/auth.dart';
 import 'package:course_book/parse/builder.dart';
 import 'package:course_book/utils/Log.dart';
-import 'package:course_book/utils/widgetUtil.dart';
+import 'package:course_book/utils/widget_util.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatelessWidget {

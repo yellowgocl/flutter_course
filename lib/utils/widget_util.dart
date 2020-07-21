@@ -495,18 +495,23 @@ class WidgetUtil {
     return result;
   }
 
+  static List<String> parseListByString<T>(String value,
+      [List<String> defaultValue]) {
+    List<String> result = defaultValue;
+    if (value is String) {
+      if (value.contains(',')) {
+        result = value.split(',');
+      } else if (value.contains(';')) {
+        result = value.split(';');
+      }
+    }
+    return result;
+  }
+
   static EdgeInsetsGeometry parseEdgeInsetsGeometry(dynamic value,
       [EdgeInsetsGeometry defaultValue]) {
     EdgeInsetsGeometry result = defaultValue;
-    if (value is String) {
-      if (value.contains(',')) {
-        value = value.split(',');
-      } else if (value.contains(';')) {
-        value = value.split(';');
-      } else {
-        value = parseDouble(value);
-      }
-    }
+    value = parseListByString(value) ?? parseDouble(value);
 
     if (value is List) {
       if (value.isNotEmpty) {
@@ -572,7 +577,7 @@ class WidgetUtil {
 
   static Widget parseChild(
       Map<String, dynamic> child, BuildContext buildContext,
-      [ClickListener listener]) {
+      [EventListener listener]) {
     return child != null
         ? BaseWidgetBuilder.buildFromMap(child, buildContext, listener)
         : null;
@@ -580,7 +585,7 @@ class WidgetUtil {
 
   static List<Widget> parseChildren(
       List<Map<String, dynamic>> children, BuildContext buildContext,
-      [ClickListener listener]) {
+      [EventListener listener]) {
     if (children == null || children.isEmpty) {
       return null;
     }
@@ -618,6 +623,110 @@ class WidgetUtil {
       result = WrapCrossAlignment.end;
     } else if (value == 2 || value == 'center') {
       result = WrapCrossAlignment.center;
+    }
+    return result;
+  }
+
+  static ImageRepeat parseImageRepeat(dynamic value,
+      [ImageRepeat defaultValue]) {
+    ImageRepeat result = defaultValue;
+    if (value == 0 || value == 'repeat') {
+      result = ImageRepeat.repeat;
+    } else if (value == 1 || value == 'repeatX') {
+      result = ImageRepeat.repeatX;
+    } else if (value == 2 || value == 'repeatY') {
+      result = ImageRepeat.repeatY;
+    } else if (value == 3 || value == 'noRepeat') {
+      result = ImageRepeat.noRepeat;
+    }
+    return result;
+  }
+
+  static Rect parseRect(dynamic value, [Rect defaultValue]) {
+    Rect result = defaultValue;
+    value = parseListByString(value) ?? parseDouble(value);
+    if (value is double) {
+      result = Rect.fromLTRB(value, value, value, value);
+    } else if (value is List && value.isNotEmpty) {
+      if (value.length >= 4) {
+        result = Rect.fromLTRB(parseDouble(value[0]), parseDouble(value[1]),
+            parseDouble(value[2]), parseDouble(value[3]));
+      } else if (value.length == 3) {
+        result = Rect.fromLTRB(parseDouble(value[0]), parseDouble(value[1]),
+            parseDouble(value[0]), parseDouble(value[2]));
+      } else if (value.length == 2) {
+        result = Rect.fromLTRB(parseDouble(value[0]), parseDouble(value[1]),
+            parseDouble(value[0]), parseDouble(value[1]));
+      }
+    } else if (value is Map && value.isNotEmpty) {
+      if (value.containsKey('left') ||
+          value.containsKey('right') ||
+          value.containsKey('top') ||
+          value.containsKey('bottom')) {
+        result = Rect.fromLTRB(
+            parseDouble(CollectionUtil.getValue(value, 'left'), 0.0),
+            parseDouble(CollectionUtil.getValue(value, 'top'), 0.0),
+            parseDouble(CollectionUtil.getValue(value, 'right'), 0.0),
+            parseDouble(CollectionUtil.getValue(value, 'bottom'), 0.0));
+      } else if (value.containsKey('left') ||
+          value.containsKey('top') ||
+          value.containsKey('width') ||
+          value.containsKey('height')) {
+        result = Rect.fromLTWH(
+            parseDouble(CollectionUtil.getValue(value, 'left'), 0.0),
+            parseDouble(CollectionUtil.getValue(value, 'top'), 0.0),
+            parseDouble(CollectionUtil.getValue(value, 'width'), 0.0),
+            parseDouble(CollectionUtil.getValue(value, 'height'), 0.0));
+      } else if (value.containsKey('center')) {
+        if (value.containsKey('width') || value.containsKey('height')) {
+          double v = parseDouble(CollectionUtil.getValue(value, 'width')) ??
+              parseDouble(CollectionUtil.getValue(value, 'height'));
+          result = Rect.fromCenter(
+              center: parseOffset(value['center'], Offset(0, 0)),
+              width: parseDouble(CollectionUtil.getValue(value, 'width'), v),
+              height: parseDouble(CollectionUtil.getValue(value, 'height'), v));
+        } else if (value.containsKey('radius')) {
+          result = Rect.fromCircle(
+              center: parseOffset(value['center'], Offset(0, 0)),
+              radius: parseDouble(CollectionUtil.getValue(value, 'radius'), 0));
+        }
+      }
+    }
+    return result;
+  }
+
+  static Offset parseOffset(dynamic value, [Offset defaultValue]) {
+    Offset result = defaultValue;
+    value = parseListByString(value) ?? parseDouble(value);
+    if (value is double) {
+      result = Offset(value, value);
+    } else if (value is List) {
+      double dx = parseDouble(value[0], 0.0);
+      double dy = parseDouble(value.length == 1 ? value[0] : value[1], 0.0);
+      result = Offset(dx, dy);
+    } else if (value is Map) {
+      if (value.containsKey('direction')) {
+        result = Offset.fromDirection(
+            parseDouble(CollectionUtil.getValue(value, 'direction'), 0.0),
+            parseDouble(CollectionUtil.getValue(value, 'distance'), 0.0));
+      } else if (value.containsKey('dx') || value.containsKey('dy')) {
+        result = Offset(parseDouble(CollectionUtil.getValue(value, 'dx'), 0.0),
+            parseDouble(CollectionUtil.getValue(value, 'dy'), 0.0));
+      }
+    }
+  }
+
+  static FilterQuality parseFilterQuality(dynamic value,
+      [FilterQuality defaultValue]) {
+    FilterQuality result = defaultValue;
+    if (value == 0 || value == 'none') {
+      result = FilterQuality.none;
+    } else if (value == 1 || value == 'low') {
+      result = FilterQuality.low;
+    } else if (value == 2 || value == 'medium') {
+      result = FilterQuality.medium;
+    } else if (value == 3 || value == 'high') {
+      result = FilterQuality.high;
     }
     return result;
   }

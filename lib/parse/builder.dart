@@ -1,8 +1,9 @@
 import 'dart:convert';
 
-import 'package:course_book/parse/common/align_and_center.dart';
+import 'package:course_book/parse/common/widget.dart';
 import 'package:course_book/parse/common/container.dart';
 import 'package:course_book/parse/common/text.dart';
+import 'package:course_book/parse/ext/flare.dart';
 import 'package:course_book/utils/log.dart';
 import 'package:flutter/widgets.dart' as Base;
 
@@ -10,9 +11,8 @@ class BaseWidgetBuilder {
   static bool _inited = false;
   static final _widgetBuilders = <String, BaseWidget>{};
   static final _builders = [
+    // containers
     Container(),
-    Text(),
-    RichText(),
     Align(),
     Center(),
     Flex(),
@@ -20,11 +20,24 @@ class BaseWidgetBuilder {
     Column(),
     Expanded(),
     Stack(),
+    IndexedStack(),
     Positioned(),
     SizedBox(),
     ExpandedSizedBox(),
     SafeArea(),
     Padding(),
+    // widgets
+    Text(),
+    RichText(),
+    Opacity(),
+    Icon(),
+    Image(),
+    AspectRatio(),
+    Baseline(),
+    RaisedButton(),
+
+    //ext
+    FlareActor()
   ];
 
   static void initDefaultBuilders() {
@@ -37,7 +50,7 @@ class BaseWidgetBuilder {
   }
 
   static Base.Widget build(String json, Base.BuildContext buildContext,
-      [ClickListener listener]) {
+      [EventListener listener]) {
     assert(json != null);
     if (json != null) {
       Map<String, dynamic> data = jsonDecode(json);
@@ -49,10 +62,10 @@ class BaseWidgetBuilder {
 
   static Base.Widget buildFromMap(
       Map<String, dynamic> source, Base.BuildContext buildContext,
-      [ClickListener listener]) {
+      [EventListener listener]) {
     initDefaultBuilders();
-    ClickListener _listener =
-        listener == null ? DefaultWidgetOnClickListener() : listener;
+    EventListener _listener =
+        listener == null ? DefaultWidgetEventListener() : listener;
     String widgetName = source['widgetName'];
     BaseWidget builder = _widgetBuilders[widgetName];
     if (builder != null) {
@@ -65,20 +78,27 @@ class BaseWidgetBuilder {
 
 abstract class BaseWidget<T> {
   Base.Widget build(
-      T data, Base.BuildContext buildContext, ClickListener listener);
+      T data, Base.BuildContext buildContext, EventListener listener);
   String get widgetName;
 }
 
 abstract class JsonWidget extends BaseWidget<Map<String, dynamic>> {}
 
-abstract class ClickListener {
+abstract class EventListener {
   void onClicked(String event);
+  void onCompleted(String event);
 }
 
-class DefaultWidgetOnClickListener extends ClickListener {
+class DefaultWidgetEventListener extends EventListener {
   @override
   void onClicked(String event) {
     // TODO: implement onClicked
     Log.v('receiver onclick: $event');
+  }
+
+  @override
+  void onCompleted(String event) {
+    // TODO: implement onCompleted
+    Log.v('receiver oncomplete: $event');
   }
 }

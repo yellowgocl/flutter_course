@@ -1,0 +1,30 @@
+{
+    "code": 200,
+    "message": "success",
+    "data": {
+        "global": { "vars": [] },
+        "points": [
+            { 
+                "type": "speech",
+                "duration": 0,
+                "skip": 3,
+                "description": "第一个交互点",
+                "audio": "http://dev.apphelper.zhibankeji.com/1-doll.mp3",
+                "conditions": [
+                    { "value": 90 , "contextId": null, "skip": 0 }
+                ],
+                "answers": [
+                    { "standard": true, "value": "doll", "name": "Doll" }
+                ],
+                "scene": {
+                    "widgetName": "Stack",
+                    "width": "match_parent",
+                    "height": "match_parent",
+                    "children": [
+                        { "widgetName": "RaisedButton", "child": [] }
+                    ]
+                }
+            }
+        ]
+    }
+}
