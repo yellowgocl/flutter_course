@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:course_book/parse/builder.dart';
 import 'package:course_book/utils/icons_helper.dart';
+import 'package:course_book/utils/log.dart';
 import 'package:course_book/utils/util.dart';
 import 'package:course_book/utils/widget_util.dart';
 import 'package:flutter/material.dart' as Base;
@@ -15,7 +16,7 @@ class Opacity extends JsonWidget {
       opacity: WidgetUtil.parseDouble(data['opacity'], 1.0),
       alwaysIncludeSemantics:
           WidgetUtil.parseBoolean(data['alwaysIncludeSemantics'], false),
-      child: WidgetUtil.parseChild(data['child'], buildContext, listener),
+      child: buildChild(data['child'], buildContext, listener),
       key: WidgetUtil.parseKey(data['key']),
     );
   }
@@ -54,16 +55,19 @@ class Image extends JsonWidget {
       semanticLabel: CollectionUtil.getValue(data, 'semanticLabelc'),
       excludeFromSemantics:
           WidgetUtil.parseBoolean(data['excludeFromSemantics'], false),
-      scale: WidgetUtil.parseDouble(data['scale']),
+      scale: WidgetUtil.parseDouble(data['scale'], 1.0),
       width: WidgetUtil.parseWidth(data['width']),
-      height: WidgetUtil.parseWidth(data['height']),
+      height: WidgetUtil.parseHeight(data['height']),
       color: WidgetUtil.parseColor(data['color']),
       colorBlendMode: WidgetUtil.parseBlendMode(data['colorBlendMode']),
       fit: WidgetUtil.parseBoxFit(data['fit']),
-      alignment: WidgetUtil.parseAlignment(data['alignment']),
-      repeat: WidgetUtil.parseImageRepeat(data['repeat']),
+      alignment:
+          WidgetUtil.parseAlignment(data['alignment'], Base.Alignment.center),
+      repeat: WidgetUtil.parseImageRepeat(
+          data['repeat'], Base.ImageRepeat.noRepeat),
       centerSlice: WidgetUtil.parseRect(data['centerSlice']),
-      matchTextDirection: WidgetUtil.parseBoolean(data['matchTextDirection']),
+      matchTextDirection:
+          WidgetUtil.parseBoolean(data['matchTextDirection'], true),
       gaplessPlayback: WidgetUtil.parseBoolean(data['gaplessPlayback']),
       filterQuality: WidgetUtil.parseFilterQuality(data['filterQuality']),
     );
@@ -76,18 +80,22 @@ class Image extends JsonWidget {
       semanticLabel: CollectionUtil.getValue(data, 'semanticLabelc'),
       excludeFromSemantics:
           WidgetUtil.parseBoolean(data['excludeFromSemantics'], false),
-      scale: WidgetUtil.parseDouble(data['scale']),
+      scale: WidgetUtil.parseDouble(data['scale'], 1.0),
       width: WidgetUtil.parseWidth(data['width']),
-      height: WidgetUtil.parseWidth(data['height']),
+      height: WidgetUtil.parseHeight(data['height']),
       color: WidgetUtil.parseColor(data['color']),
       colorBlendMode: WidgetUtil.parseBlendMode(data['colorBlendMode']),
-      fit: WidgetUtil.parseBoxFit(data['fit']),
-      alignment: WidgetUtil.parseAlignment(data['alignment']),
-      repeat: WidgetUtil.parseImageRepeat(data['repeat']),
+      fit: WidgetUtil.parseBoxFit(data['fit'], Base.BoxFit.contain),
+      alignment:
+          WidgetUtil.parseAlignment(data['alignment'], Base.Alignment.center),
+      repeat: WidgetUtil.parseImageRepeat(
+          data['repeat'], Base.ImageRepeat.noRepeat),
       centerSlice: WidgetUtil.parseRect(data['centerSlice']),
-      matchTextDirection: WidgetUtil.parseBoolean(data['matchTextDirection']),
-      gaplessPlayback: WidgetUtil.parseBoolean(data['gaplessPlayback']),
-      filterQuality: WidgetUtil.parseFilterQuality(data['filterQuality']),
+      matchTextDirection:
+          WidgetUtil.parseBoolean(data['matchTextDirection'], true),
+      gaplessPlayback: WidgetUtil.parseBoolean(data['gaplessPlayback'], false),
+      filterQuality: WidgetUtil.parseFilterQuality(
+          data['filterQuality'], Base.FilterQuality.low),
     );
   }
 
@@ -98,16 +106,19 @@ class Image extends JsonWidget {
       semanticLabel: CollectionUtil.getValue(data, 'semanticLabelc'),
       excludeFromSemantics:
           WidgetUtil.parseBoolean(data['excludeFromSemantics'], false),
-      scale: WidgetUtil.parseDouble(data['scale']),
+      scale: WidgetUtil.parseDouble(data['scale'], 1.0),
       width: WidgetUtil.parseWidth(data['width']),
-      height: WidgetUtil.parseWidth(data['height']),
+      height: WidgetUtil.parseHeight(data['height']),
       color: WidgetUtil.parseColor(data['color']),
       colorBlendMode: WidgetUtil.parseBlendMode(data['colorBlendMode']),
       fit: WidgetUtil.parseBoxFit(data['fit']),
-      alignment: WidgetUtil.parseAlignment(data['alignment']),
-      repeat: WidgetUtil.parseImageRepeat(data['repeat']),
+      alignment:
+          WidgetUtil.parseAlignment(data['alignment'], Base.Alignment.center),
+      repeat: WidgetUtil.parseImageRepeat(
+          data['repeat'], Base.ImageRepeat.noRepeat),
       centerSlice: WidgetUtil.parseRect(data['centerSlice']),
-      matchTextDirection: WidgetUtil.parseBoolean(data['matchTextDirection']),
+      matchTextDirection:
+          WidgetUtil.parseBoolean(data['matchTextDirection'], true),
       gaplessPlayback: WidgetUtil.parseBoolean(data['gaplessPlayback']),
       filterQuality: WidgetUtil.parseFilterQuality(data['filterQuality']),
     );
@@ -137,31 +148,13 @@ class Image extends JsonWidget {
           listener.onClicked(clickEvent);
         },
       );
-
-      return result;
     }
+    return result;
   }
 
   @override
   // TODO: implement widgetName
   String get widgetName => 'Image';
-}
-
-class AspectRatio extends JsonWidget {
-  @override
-  Base.Widget build(Map<String, dynamic> data, Base.BuildContext buildContext,
-      EventListener listener) {
-    // TODO: implement build
-    return Base.AspectRatio(
-      key: WidgetUtil.parseKey(data['key']),
-      aspectRatio: WidgetUtil.parseDouble(data['aspectRatio'], 16.0 / 9.0),
-      child: WidgetUtil.parseChild(data['child'], buildContext, listener),
-    );
-  }
-
-  @override
-  // TODO: implement widgetName
-  String get widgetName => 'AspectRatio';
 }
 
 class Baseline extends JsonWidget {
@@ -173,7 +166,7 @@ class Baseline extends JsonWidget {
       key: WidgetUtil.parseKey(data['key']),
       baselineType: WidgetUtil.parseTextBaseline(data['baselineType']),
       baseline: WidgetUtil.parseDouble(data['baseline']),
-      child: WidgetUtil.parseChild(data['child'], buildContext, listener),
+      child: buildChild(data['child'], buildContext, listener),
     );
   }
 
@@ -196,7 +189,7 @@ class RaisedButton extends JsonWidget {
       padding: WidgetUtil.parseEdgeInsetsGeometry(data['padding']),
       splashColor: WidgetUtil.parseColor(data['splashColor']),
       textColor: WidgetUtil.parseColor(data['textColor']),
-      child: WidgetUtil.parseChild(data['child'], buildContext, listener),
+      child: buildChild(data['child'], buildContext, listener),
       onPressed: () {
         listener?.onClicked(CollectionUtil.getValue(data, 'onClick', ''));
       },

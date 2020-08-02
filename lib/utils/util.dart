@@ -1,5 +1,6 @@
 import 'dart:async' show Future;
 import 'package:course_book/core/enums.dart';
+import 'package:course_book/model/course/course.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 class Util {
@@ -23,6 +24,16 @@ class Util {
     int result = defaultValue;
     if (value != null) {
       result = value.index;
+    }
+    return result;
+  }
+
+  static Duration parseDuration(dynamic value, [Duration defaultValue]) {
+    Duration result = defaultValue;
+    if (value is Duration) {
+      result = value;
+    } else if (value is int) {
+      result = Duration(milliseconds: value);
     }
     return result;
   }

@@ -21,7 +21,121 @@
                     "width": "match_parent",
                     "height": "match_parent",
                     "children": [
-                        { "widgetName": "RaisedButton", "child": [] }
+                        {
+                            "widgetName": "Align",
+                            "alignment": "bottomCenter",
+                            "child": {
+                                "widgetName": "Row",
+                                "children": [
+                                    { 
+                                        "widgetName": "RaisedButton", "child": {
+                                            "widgetName": "Text",
+                                            "data": "选项1"
+                                        }
+                                    },
+                                    {
+                                        "widgetName": "Padding",
+                                        "padding": { "x": 20 },
+                                        "child": { 
+                                            "widgetName": "RaisedButton", "child": {
+                                                "widgetName": "Text",
+                                                "data": "选项2"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "widgetName": "RadioGroup",
+                            "child": {
+                                "widgetName": "Align",
+                                "alignment": "bottomCenter",
+                                "child": {
+                                    "widgetName": "RadioButton",
+                                    "params": { "value": "123", "id": "1000000" },
+                                    "child": {
+                                        "widgetName": "SizedBox",
+                                        "width": "200",
+                                        "height": "200dp",
+                                        "child": { 
+                                            "widgetName": "Image",
+                                            "fit": "contain",
+                                            "src": "http://dev.apphelper.zhibankeji.com/img_what_is_the_missing_car.png"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            { 
+                "type": "speech",
+                "duration": 0,
+                "skip": 3,
+                "description": "第二个交互点",
+                "audio": "http://dev.apphelper.zhibankeji.com/1-doll.mp3",
+                "conditions": [
+                    { "value": 90 , "contextId": null, "skip": 0 }
+                ],
+                "answers": [
+                    { "standard": true, "value": "doll", "name": "Doll" }
+                ],
+                "scene": {
+                    "widgetName": "Stack",
+                    "width": "match_parent",
+                    "height": "match_parent",
+                    "children": [
+                        {
+                            "widgetName": "Align",
+                            "alignment": "bottomCenter",
+                            "child": {
+                                "widgetName": "Container",
+                                "height": 200,
+                                "child": {
+                                    "widgetName": "Row",
+                                    "height": 200,
+                                    "children": [
+                                        { 
+                                            "widgetName": "RaisedButton", "child": {
+                                                "widgetName": "Text",
+                                                "data": "选项1"
+                                            }
+                                        },
+                                        {
+                                            "widgetName": "Expanded",
+                                            "flex": 1,
+                                            "child": {
+                                                "widgetName": "Padding",
+                                                "padding": { "x": 20 },
+                                                "child": {
+                                                    "widgetName": "Column",
+                                                    "children": [
+                                                        {
+                                                            "widgetName": "Expanded",
+                                                            "flex": 1,
+                                                            "child": { 
+                                                                "widgetName": "Image",
+                                                                "fit": "contain",
+                                                                "src": "http://dev.apphelper.zhibankeji.com/img_what_is_the_missing_car.png"
+                                                            }
+                                                        },
+                                                        { 
+                                                            "widgetName": "RaisedButton", 
+                                                            "child": {
+                                                                "widgetName": "Text",
+                                                                "data": "选项2"
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        }
                     ]
                 }
             }

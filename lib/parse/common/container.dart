@@ -1,4 +1,6 @@
 import 'package:course_book/parse/builder.dart';
+import 'package:course_book/utils/log.dart';
+import 'package:course_book/utils/util.dart';
 import 'package:course_book/utils/widget_util.dart';
 import 'package:flutter/widgets.dart' as Base;
 
@@ -7,8 +9,7 @@ class Container extends JsonWidget {
   Base.Widget build(Map<String, dynamic> data, Base.BuildContext buildContext,
       EventListener listener) {
     // TODO: implement build
-    Base.Widget child =
-        WidgetUtil.parseChild(data['child'], buildContext, listener);
+    Base.Widget child = buildChild(data['child'], buildContext, listener);
     return Base.LayoutBuilder(
       builder: (Base.BuildContext context, Base.BoxConstraints constraints) {
         return Base.Container(
@@ -31,6 +32,22 @@ class Container extends JsonWidget {
   String get widgetName => 'Container';
 }
 
+class ConstrainedBox extends JsonWidget {
+  @override
+  Base.Widget build(Map<String, dynamic> data, Base.BuildContext buildContext,
+      EventListener listener) {
+    // TODO: implement build
+    return Base.ConstrainedBox(
+      constraints: Base.BoxConstraints.expand(),
+      child: buildChild(data['child'], buildContext, listener),
+    );
+  }
+
+  @override
+  // TODO: implement widgetName
+  String get widgetName => 'ConstrainedBox';
+}
+
 class Flex extends JsonWidget {
   @override
   Base.Widget build(Map<String, dynamic> data, Base.BuildContext buildContext,
@@ -49,8 +66,7 @@ class Flex extends JsonWidget {
       mainAxisSize: WidgetUtil.parseMainAxisSize(
           data['mainAxisSize'], Base.MainAxisSize.max),
       key: WidgetUtil.parseKey(data['key']),
-      children:
-          WidgetUtil.parseChildren(data['children'], buildContext, listener),
+      children: buildChildren(data, buildContext, listener),
     );
   }
 
@@ -76,8 +92,7 @@ class Column extends JsonWidget {
       mainAxisSize: WidgetUtil.parseMainAxisSize(
           data['mainAxisSize'], Base.MainAxisSize.max),
       key: WidgetUtil.parseKey(data['key']),
-      children:
-          WidgetUtil.parseChildren(data['children'], buildContext, listener),
+      children: buildChildren(data, buildContext, listener),
     );
   }
 
@@ -103,8 +118,7 @@ class Row extends JsonWidget {
       mainAxisSize: WidgetUtil.parseMainAxisSize(
           data['mainAxisSize'], Base.MainAxisSize.max),
       key: WidgetUtil.parseKey(data['key']),
-      children:
-          WidgetUtil.parseChildren(data['children'], buildContext, listener),
+      children: buildChildren(data, buildContext, listener),
     );
   }
 
@@ -121,7 +135,7 @@ class Expanded extends JsonWidget {
 
     return Base.Expanded(
       key: data['key'] != null ? Base.Key(data['key']) : null,
-      child: WidgetUtil.parseChild(data['child'], buildContext, listener),
+      child: buildChild(data['child'], buildContext, listener),
       flex: data['flex'],
     );
   }
@@ -138,7 +152,7 @@ class ExpandedSizedBox extends JsonWidget {
     // TODO: implement build
     return Base.SizedBox.expand(
         key: WidgetUtil.parseKey(data['key']),
-        child: WidgetUtil.parseChild(data['child'], buildContext, listener));
+        child: buildChild(data['child'], buildContext, listener));
   }
 
   @override
@@ -151,16 +165,45 @@ class SizedBox extends JsonWidget {
   Base.Widget build(Map<String, dynamic> data, Base.BuildContext buildContext,
       EventListener listener) {
     // TODO: implement build
-    return Base.SizedBox(
-        width: WidgetUtil.parseWidth(data['width']),
-        height: WidgetUtil.parseHeight(data['height']),
-        key: WidgetUtil.parseKey(data['key']),
-        child: WidgetUtil.parseChild(data['child'], buildContext, listener));
+    var width = CollectionUtil.getValue(data, 'width');
+    var height = CollectionUtil.getValue(data, 'height');
+    bool isFractionallySizedBox = (width is String && width.contains('%')) ||
+        (height is String && height.contains('%'));
+    return isFractionallySizedBox
+        ? Base.FractionallySizedBox(
+            alignment: WidgetUtil.parseAlignment(
+                data['alignment'], Base.Alignment.center),
+            widthFactor: WidgetUtil.parseWidth(width, 1.0),
+            heightFactor: WidgetUtil.parseHeight(height, 1.0),
+            key: WidgetUtil.parseKey(data['key']),
+            child: buildChild(data['child'], buildContext, listener))
+        : Base.SizedBox(
+            width: WidgetUtil.parseWidth(data['width']),
+            height: WidgetUtil.parseHeight(data['height']),
+            key: WidgetUtil.parseKey(data['key']),
+            child: buildChild(data['child'], buildContext, listener));
   }
 
   @override
   // TODO: implement widgetName
   String get widgetName => 'SizedBox';
+}
+
+class AspectRatio extends JsonWidget {
+  @override
+  Base.Widget build(Map<String, dynamic> data, Base.BuildContext buildContext,
+      EventListener listener) {
+    // TODO: implement build
+    return Base.AspectRatio(
+      key: WidgetUtil.parseKey(data['key']),
+      aspectRatio: WidgetUtil.parseDouble(data['aspectRatio'], 16.0 / 9.0),
+      child: buildChild(data['child'], buildContext, listener),
+    );
+  }
+
+  @override
+  // TODO: implement widgetName
+  String get widgetName => 'AspectRatio';
 }
 
 class FittedBox extends JsonWidget {
@@ -195,8 +238,7 @@ class Wrap extends JsonWidget {
       textDirection: WidgetUtil.parseTextDirection(data['textDirection']),
       verticalDirection: WidgetUtil.parseVerticalDirection(
           data['verticalDirection'], Base.VerticalDirection.down),
-      children:
-          WidgetUtil.parseChildren(data['children'], buildContext, listener),
+      children: buildChildren(data, buildContext, listener),
     );
   }
 
@@ -211,7 +253,7 @@ class SafeArea extends JsonWidget {
       EventListener listener) {
     // TODO: implement build
     return Base.SafeArea(
-      child: WidgetUtil.parseChild(data['child'], buildContext, listener),
+      child: buildChild(data['child'], buildContext, listener),
       minimum: WidgetUtil.parseEdgeInsetsGeometry(data['minimum']),
       left: WidgetUtil.parseBoolean(data['left'], true),
       right: WidgetUtil.parseBoolean(data['right'], true),
@@ -233,7 +275,8 @@ class Padding extends JsonWidget {
       EventListener listener) {
     // TODO: implement build
     return Base.Padding(
-      child: WidgetUtil.parseChild(data['child'], buildContext, listener),
+      key: WidgetUtil.parseKey(data['key']),
+      child: buildChild(data['child'], buildContext, listener),
       padding: WidgetUtil.parseEdgeInsetsGeometry(data['padding']),
     );
   }
@@ -248,8 +291,7 @@ class Align extends JsonWidget {
   Base.Widget build(Map<String, dynamic> data, Base.BuildContext buildContext,
       EventListener listener) {
     // TODO: implement build
-    Base.Widget child =
-        WidgetUtil.parseChild(data['child'], buildContext, listener);
+    Base.Widget child = buildChild(data['child'], buildContext, listener);
     return Base.Align(
       key: WidgetUtil.parseKey(data['key']),
       child: child,
@@ -269,8 +311,7 @@ class Center extends JsonWidget {
   Base.Widget build(Map<String, dynamic> data, Base.BuildContext buildContext,
       EventListener listener) {
     // TODO: implement build
-    Base.Widget child =
-        WidgetUtil.parseChild(data['child'], buildContext, listener);
+    Base.Widget child = buildChild(data['child'], buildContext, listener);
     return Base.Center(
       key: WidgetUtil.parseKey(data['key']),
       child: child,
@@ -296,9 +337,9 @@ class Stack extends JsonWidget {
           data['alignment'], Base.AlignmentDirectional.topStart),
       textDirection: WidgetUtil.parseTextDirection(data['textDirection']),
       fit: WidgetUtil.parseStackFit(data['fit'], Base.StackFit.loose),
-      overflow: WidgetUtil.parseOverflow(data['overflow']),
-      children:
-          WidgetUtil.parseChildren(data['children'], buildContext, listener),
+      overflow:
+          WidgetUtil.parseOverflow(data['overflow'], Base.Overflow.visible),
+      children: buildChildren(data, buildContext, listener),
     );
   }
 
@@ -319,8 +360,7 @@ class IndexedStack extends JsonWidget {
       alignment: WidgetUtil.parseAlignment(
           data['alignment'], Base.AlignmentDirectional.topStart),
       textDirection: WidgetUtil.parseTextDirection(data['textDirection']),
-      children:
-          WidgetUtil.parseChildren(data['children'], buildContext, listener),
+      children: buildChildren(data, buildContext, listener),
     );
   }
 
@@ -342,7 +382,7 @@ class Positioned extends JsonWidget {
       left: WidgetUtil.parseDouble(data['left']),
       width: WidgetUtil.parseWidth(data['width']),
       height: WidgetUtil.parseHeight(data['height']),
-      child: WidgetUtil.parseChild(data['child'], buildContext, listener),
+      child: buildChild(data['child'], buildContext, listener),
     );
   }
 

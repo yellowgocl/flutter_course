@@ -4,6 +4,7 @@ import 'package:course_book/utils/util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart' as Intl;
 
 class WidgetUtil {
   /// parseTextAlign(String|int value)
@@ -77,8 +78,9 @@ class WidgetUtil {
     return result;
   }
 
-  static TextDirection parseTextDirection(dynamic value) {
-    TextDirection result = TextDirection.ltr;
+  static TextDirection parseTextDirection(dynamic value,
+      [TextDirection defaultValue]) {
+    TextDirection result = defaultValue;
     if (value == 0 || value == 'rtl') {
       result = TextDirection.rtl;
     }
@@ -122,8 +124,8 @@ class WidgetUtil {
     return result;
   }
 
-  static Color parseColor(dynamic value) {
-    Color result = Colors.black;
+  static Color parseColor(dynamic value, [Color defaultValue]) {
+    Color result = defaultValue;
     if (value is String) {
       result = Color(parseHex(value));
     }
@@ -243,26 +245,24 @@ class WidgetUtil {
     return result;
   }
 
-  static BoxFit parseBoxFit(dynamic value) {
-    if (value == null || value < 0) {
-      return null;
-    }
+  static BoxFit parseBoxFit(dynamic value, [BoxFit defaultValue]) {
+    BoxFit result = defaultValue;
     if (value == 0 || value == 'fill') {
-      return BoxFit.fill;
+      result = BoxFit.fill;
     } else if (value == 1 || value == 'contain') {
-      return BoxFit.contain;
+      result = BoxFit.contain;
     } else if (value == 2 || value == 'cover') {
-      return BoxFit.cover;
+      result = BoxFit.cover;
     } else if (value == 3 || value == 'fitWidth') {
-      return BoxFit.fitWidth;
+      result = BoxFit.fitWidth;
     } else if (value == 4 || value == 'fitHeight') {
-      return BoxFit.fitHeight;
+      result = BoxFit.fitHeight;
     } else if (value == 5 || value == 'none') {
-      return BoxFit.none;
+      result = BoxFit.none;
     } else if (value == 6 || value == 'scaleDown') {
-      return BoxFit.scaleDown;
+      result = BoxFit.scaleDown;
     }
-    return null;
+    return result;
   }
 
   static Axis parseAxis(dynamic value, [Axis defaultValue]) {
@@ -453,28 +453,48 @@ class WidgetUtil {
   }
 
   static double parseWidth(value, [double defaultValue]) {
-    if (value == 'match_parent' || value == 'matchParent') {
-      value = parseDouble(ScreenUtil.screenWidth);
-    } else if (value == 'wrap_content' || value == 'wrapContent') {
-      value = parseDouble(double.maxFinite);
+    if (value is String) {
+      String v = value;
+      if (value == 'match_parent' || value == 'matchParent') {
+        value = parseDouble(ScreenUtil.screenWidth);
+      } else if (value == 'wrap_content' || value == 'wrapContent') {
+        value = parseDouble(double.maxFinite);
+      } else if (value.endsWith('dp')) {
+        value = ScreenUtil()
+            .setWidth(parseDouble(value.replaceAll('dp', ''), defaultValue));
+      }
     }
-    return parseDouble(value);
+    return parseDouble(value, defaultValue);
   }
 
   static double parseHeight(value, [double defaultValue]) {
-    if (value == 'match_parent' || value == 'matchParent') {
-      value = parseDouble(ScreenUtil.screenHeight);
-    } else if (value == 'wrap_content' || value == 'wrapContent') {
-      value = parseDouble(double.maxFinite);
+    if (value is String) {
+      if (value == 'match_parent' || value == 'matchParent') {
+        value = parseDouble(ScreenUtil.screenHeight);
+      } else if (value == 'wrap_content' || value == 'wrapContent') {
+        value = parseDouble(double.maxFinite);
+      } else if (value.endsWith('dp')) {
+        value = ScreenUtil()
+            .setWidth(parseDouble(value.replaceAll('dp', ''), defaultValue));
+      }
     }
-    return parseDouble(value);
+    double result = parseDouble(value, defaultValue);
+    return result;
   }
 
-  static double parseDouble(value, [double defualtValue]) {
+  static double parseDouble(dynamic value, [double defualtValue]) {
     double result = defualtValue != null ? defualtValue : null;
     if (value is int) {
       value = value.toDouble();
+    } else if (value is String) {
+      try {
+        value = Intl.NumberFormat().parse(value);
+      } on FormatException catch (err) {
+        Log.e(err?.message);
+        value = defualtValue;
+      }
     }
+
     if (value != null) {
       result = value >= double.maxFinite ? double.maxFinite : value;
     }
@@ -511,8 +531,9 @@ class WidgetUtil {
   static EdgeInsetsGeometry parseEdgeInsetsGeometry(dynamic value,
       [EdgeInsetsGeometry defaultValue]) {
     EdgeInsetsGeometry result = defaultValue;
-    value = parseListByString(value) ?? parseDouble(value);
-
+    if (value is String) {
+      value = parseListByString(value) ?? parseDouble(value);
+    }
     if (value is List) {
       if (value.isNotEmpty) {
         if (value.length == 2) {
@@ -542,11 +563,15 @@ class WidgetUtil {
     if (value == 0 || value == 'zero') {
       result = EdgeInsets.zero;
     } else if (value is Map) {
+      if (value.containsKey('x') || value.containsKey('y')) {
+        value['right'] = value['left'] = parseDouble(value['x']);
+        value['top'] = value['bottom'] = parseDouble(value['y']);
+      }
       result = EdgeInsets.only(
-        left: parseDouble(value['left']),
-        right: parseDouble(value['right']),
-        top: parseDouble(value['top']),
-        bottom: parseDouble(value['bottom']),
+        left: parseDouble(value['left'], 0.0),
+        right: parseDouble(value['right'], 0.0),
+        top: parseDouble(value['top'], 0.0),
+        bottom: parseDouble(value['bottom'], 0.0),
       );
     } else if (value is double) {
       result = EdgeInsets.all(value);
@@ -577,21 +602,25 @@ class WidgetUtil {
 
   static Widget parseChild(
       Map<String, dynamic> child, BuildContext buildContext,
-      [EventListener listener]) {
+      [EventListener listener,
+      Widget Function(Map<String, dynamic> child, BuildContext buildContext,
+              [EventListener listener])
+          combine]) {
     return child != null
-        ? BaseWidgetBuilder.buildFromMap(child, buildContext, listener)
+        ? combine != null
+            ? combine(child, buildContext, listener)
+            : BaseWidgetBuilder.buildFromMap(child, buildContext, listener)
         : null;
   }
 
   static List<Widget> parseChildren(
-      List<Map<String, dynamic>> children, BuildContext buildContext,
+      List<dynamic> children, BuildContext buildContext,
       [EventListener listener]) {
     if (children == null || children.isEmpty) {
       return null;
     }
     return children
-        .map<Widget>((Map<String, dynamic> child) =>
-            parseChild(child, buildContext, listener))
+        .map<Widget>((child) => parseChild(child, buildContext, listener))
         .toList();
   }
 

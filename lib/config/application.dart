@@ -1,6 +1,9 @@
 import 'package:course_book/config/routes.dart';
 import 'package:course_book/core/gameController.dart';
 import 'package:course_book/http/request.dart';
+import 'package:course_book/parse/builder.dart';
+import 'package:course_book/parse/ext/flare.dart';
+import 'package:course_book/parse/ext/interactive.dart';
 import 'package:fluro/fluro.dart';
 
 import 'package:course_book/env/env.dart';
@@ -38,10 +41,18 @@ class Application {
     _secretKey = val;
   }
 
+  void addExtBuilders() {
+    BaseWidgetBuilder.addBuilder(FlareActor());
+    BaseWidgetBuilder.addBuilder(Button());
+    BaseWidgetBuilder.addBuilder(RadioButton());
+    BaseWidgetBuilder.addBuilder(RadioGroup());
+  }
+
   Future<bool> initialize(
       {String envSign = 'dev', GameContrller gameContrller}) async {
     this.gameContrller = gameContrller;
     if (!inited) {
+      addExtBuilders();
       ScreenUtil.init(width: 750, height: 1334, allowFontScaling: true);
       RoutesController.configureRoutes(router);
       inited = true;
