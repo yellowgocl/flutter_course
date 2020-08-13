@@ -1,3 +1,4 @@
+import 'package:course_book/components/inputs.dart';
 import 'package:course_book/config/application.dart';
 import 'package:course_book/parse/builder.dart';
 import 'package:course_book/utils/log.dart';
@@ -46,7 +47,17 @@ class RadioButton extends Button {
   Base.Widget build(Map<String, dynamic> data, Base.BuildContext buildContext,
       EventListener listener) {
     // TODO: implement build
-    return super.build(data, buildContext, listener);
+    String clickEvent = CollectionUtil.getValue(data, 'onClick');
+    dynamic params = CollectionUtil.getValue(data, 'params');
+
+    listener = listener ?? DefaultClickListener();
+    return RadioBuilder(
+      onChanged: (value) => listener?.onClicked(clickEvent, value),
+      value: CollectionUtil.getValue(data, 'value'),
+      builder: (buildContext, value, groupValue) {
+        return buildChild(data['child'], buildContext, listener);
+      },
+    );
   }
 
   @override

@@ -24,6 +24,11 @@ class _HomePageState extends State<HomePage> {
       body: RadioGroup<Map<String, dynamic>>(
         options: options,
         checked: checked,
+        containerBuilder: (BuildContext context, List<Widget> items) {
+          return Column(
+            children: items,
+          );
+        },
         itemBuilder: (BuildContext context, Map<String, dynamic> value,
             Map<String, dynamic> groupValue,
             [int index]) {

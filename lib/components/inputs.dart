@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 class RadioBuilder<T> extends StatefulWidget {
   final T value;
   final T groupValue;
+  final bool disabled;
   final Function(T value) onChanged;
   final Widget Function(BuildContext context, T value, T groupValue) builder;
   RadioBuilder(
       {@required this.value,
       Key key,
+      this.disabled = false,
       this.groupValue,
       @required this.onChanged,
       @required this.builder})
@@ -25,20 +27,10 @@ class _RadioState<T> extends State<RadioBuilder<T>> {
         key: widget?.key,
         onTap: () {
           // RadioGroupState.of(context)?.setChecked(widget?.value);
-          if (widget?.value != widget?.groupValue)
+          if (!widget.disabled && widget?.value != widget?.groupValue)
             widget?.onChanged(widget?.value);
         },
         child: widget?.builder(context, widget?.value, widget?.groupValue));
-    // return Stack(children: [
-    //   Visibility(
-    //     visible: false,
-    //     child: Radio<T>(
-    //         value: widget.value,
-    //         groupValue: widget.groupValue,
-    //         onChanged: widget.onChanged),
-    //   ),
-    //   widget?.builder(context, widget?.value, widget?.groupValue)
-    // ]);
   }
 }
 
@@ -47,8 +39,8 @@ class RadioGroup<T> extends StatefulWidget {
   final List<T> options;
   final Widget Function(BuildContext context, T data, T groupValue, [int index])
       itemBuilder;
-  final MultiChildRenderObjectWidget Function(BuildContext context)
-      containerBuilder;
+  final MultiChildRenderObjectWidget Function(
+      BuildContext context, List<Widget> items) containerBuilder;
   final void Function(T value) onChanged;
   RadioGroup(
       {Key key,
@@ -70,12 +62,13 @@ class RadioGroupState<T> extends State<RadioGroup<T>> {
   }
 
   List<Widget> buildItems(BuildContext context) {
-    List<Widget> result = widget?.options?.map((e) {
+    List<Widget> result = widget?.options?.asMap()?.keys?.map((index) {
+      T e = widget?.options[index];
       return RadioBuilder(
         value: e,
         groupValue: widget?.checked,
         builder: (BuildContext context, T value, T groupValue) {
-          return widget?.itemBuilder(context, value, groupValue);
+          return widget?.itemBuilder(context, value, groupValue, index);
         },
         onChanged: widget?.onChanged,
       );
@@ -83,13 +76,15 @@ class RadioGroupState<T> extends State<RadioGroup<T>> {
     return result;
   }
 
+  Widget _containerBuilder(BuildContext context, List<Widget> items) {
+    return Row(
+      children: items,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Widget container = widget?.containerBuilder(context) ?? Row();
-    // widget?.containerBuilder(context)..children = buildItems(context);
-
-    return Row(
-      children: buildItems(context),
-    );
+    Function caller = widget?.containerBuilder ?? _containerBuilder;
+    return caller(context, buildItems(context));
   }
 }
